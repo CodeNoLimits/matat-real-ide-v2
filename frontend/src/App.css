@@ -1,0 +1,564 @@
+/* 🔮 MATAT REAL IDE - Professional Cyberpunk Theme */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
+  background: #0d1117;
+  color: #f0f6fc;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================================================
+   APP LAYOUT
+   ============================================================================= */
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+}
+
+/* =============================================================================
+   HEADER
+   ============================================================================= */
+
+.app-header {
+  height: 60px;
+  background: linear-gradient(90deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+  border-bottom: 2px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #00ff88 50%, transparent 100%);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 8px #00ff88);
+  animation: pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { filter: drop-shadow(0 0 8px #00ff88); }
+  to { filter: drop-shadow(0 0 15px #00ff88aa); }
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f0f6fc;
+  text-shadow: 0 0 10px #00ff8844;
+}
+
+.version {
+  font-size: 11px;
+  color: #8b949e;
+  padding: 2px 8px;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  background: rgba(13, 17, 23, 0.8);
+}
+
+.status-indicators {
+  display: flex;
+  gap: 16px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.status-item.online .status-dot {
+  background: #00ff88;
+  box-shadow: 0 0 8px #00ff88aa;
+}
+
+.status-item.offline .status-dot {
+  background: #ff6b6b;
+  box-shadow: 0 0 8px #ff6b6baa;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: statusPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+}
+
+.cli-btn {
+  padding: 8px 16px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+  color: #f0f6fc;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cli-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.cli-btn:hover::before {
+  left: 100%;
+}
+
+.cli-btn.gemini {
+  border-color: #6f42c1;
+  color: #b19cd9;
+}
+
+.cli-btn.gemini:hover,
+.cli-btn.gemini.active {
+  background: linear-gradient(135deg, #6f42c1 0%, #8b5cf6 100%);
+  box-shadow: 0 0 20px #6f42c144;
+  transform: translateY(-1px);
+}
+
+.cli-btn.claude {
+  border-color: #0969da;
+  color: #58a6ff;
+}
+
+.cli-btn.claude:hover,
+.cli-btn.claude.active {
+  background: linear-gradient(135deg, #0969da 0%, #1f6feb 100%);
+  box-shadow: 0 0 20px #0969da44;
+  transform: translateY(-1px);
+}
+
+.cli-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* =============================================================================
+   MAIN LAYOUT
+   ============================================================================= */
+
+.main-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  grid-template-areas: "sidebar terminal chat";
+  overflow: hidden;
+}
+
+/* =============================================================================
+   SIDEBAR - FILE EXPLORER
+   ============================================================================= */
+
+.sidebar {
+  grid-area: sidebar;
+  background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+  border-right: 1px solid #30363d;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, #00ff88 50%, transparent 100%);
+}
+
+/* =============================================================================
+   TERMINAL AREA
+   ============================================================================= */
+
+.terminal-area {
+  grid-area: terminal;
+  display: flex;
+  flex-direction: column;
+  background: #0d1117;
+  overflow: hidden;
+}
+
+.terminal-header {
+  height: 40px;
+  background: linear-gradient(90deg, #161b22 0%, #21262d 100%);
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.terminal-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.terminal-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px 6px 0 0;
+  font-size: 12px;
+  color: #8b949e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.terminal-tab.active {
+  background: #0d1117;
+  color: #f0f6fc;
+  border: 1px solid #30363d;
+  border-bottom: 1px solid #0d1117;
+  position: relative;
+  z-index: 1;
+}
+
+.cli-indicator {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #238636;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.terminal-container {
+  flex: 1;
+  background: #0d1117;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Custom terminal styling */
+.terminal-container .xterm {
+  height: 100% !important;
+  background: #0d1117 !important;
+}
+
+.terminal-container .xterm .xterm-viewport {
+  background: #0d1117 !important;
+}
+
+.terminal-container .xterm .xterm-screen {
+  background: #0d1117 !important;
+}
+
+/* Terminal scrollbar */
+.terminal-container .xterm .xterm-viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-container .xterm .xterm-viewport::-webkit-scrollbar-track {
+  background: #161b22;
+}
+
+.terminal-container .xterm .xterm-viewport::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 4px;
+}
+
+.terminal-container .xterm .xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+/* =============================================================================
+   CHAT AREA
+   ============================================================================= */
+
+.chat-area {
+  grid-area: chat;
+  background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+  border-left: 1px solid #30363d;
+  overflow: hidden;
+  position: relative;
+}
+
+.chat-area::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, #00ff88 50%, transparent 100%);
+}
+
+/* =============================================================================
+   STATUS BAR
+   ============================================================================= */
+
+.status-bar {
+  height: 24px;
+  background: linear-gradient(90deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+  border-top: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 11px;
+  position: relative;
+}
+
+.status-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #00ff88 50%, transparent 100%);
+}
+
+.status-left,
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.separator {
+  color: #30363d;
+  font-weight: bold;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 1200px) {
+  .main-layout {
+    grid-template-columns: 240px 1fr 280px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .main-layout {
+    grid-template-columns: 200px 1fr 240px;
+  }
+
+  .header-left {
+    gap: 20px;
+  }
+
+  .status-indicators {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 800px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 200px 1fr;
+    grid-template-areas:
+      "sidebar"
+      "terminal";
+  }
+
+  .chat-area {
+    display: none;
+  }
+
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .status-indicators {
+    display: none;
+  }
+}
+
+/* =============================================================================
+   ANIMATIONS & EFFECTS
+   ============================================================================= */
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.app-header {
+  animation: slideInFromTop 0.6s ease-out;
+}
+
+.sidebar {
+  animation: slideInFromLeft 0.6s ease-out 0.1s both;
+}
+
+.terminal-area {
+  animation: slideInFromTop 0.6s ease-out 0.2s both;
+}
+
+.chat-area {
+  animation: slideInFromRight 0.6s ease-out 0.3s both;
+}
+
+.status-bar {
+  animation: slideInFromTop 0.6s ease-out 0.4s both;
+}
+
+/* =============================================================================
+   LOADING STATES
+   ============================================================================= */
+
+.loading-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #30363d;
+  border-radius: 50%;
+  border-top-color: #00ff88;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =============================================================================
+   FOCUS STATES
+   ============================================================================= */
+
+*:focus {
+  outline: 2px solid #00ff88;
+  outline-offset: 2px;
+}
+
+button:focus,
+input:focus {
+  outline: 1px solid #00ff88;
+  outline-offset: 1px;
+}
+
+/* =============================================================================
+   SELECTION
+   ============================================================================= */
+
+::selection {
+  background: rgba(0, 255, 136, 0.3);
+}
+
+::-moz-selection {
+  background: rgba(0, 255, 136, 0.3);
+}
+
+/* =============================================================================
+   SCROLLBARS
+   ============================================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #161b22;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+::-webkit-scrollbar-corner {
+  background: #161b22;
+}
