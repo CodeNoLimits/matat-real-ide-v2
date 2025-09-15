@@ -3,7 +3,7 @@
 
 class OpenRouterAI {
     constructor(apiKey) {
-        this.apiKey = apiKey;
+        this.apiKey = apiKey || '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';
         this.baseURL = 'https://openrouter.ai/api/v1';
         this.model = 'openai/chatgpt-nano-5'; // ChatGPT Nano 5 - Nouveau et moins cher
         this.maxTokens = 4096;

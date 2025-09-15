@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 
 interface FileExplorerProps {
@@ -14,10 +14,34 @@ interface FileItem {
   modified: Date;
 }
 
+interface FileNode {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  children: FileNode[];
+}
+
+interface ContextMenu {
+  x: number;
+  y: number;
+  node: FileNode;
+}
+
+interface CreatingItem {
+  type: 'file' | 'directory';
+  parent: string;
+}
+
 const FileExplorer: React.FC<FileExplorerProps> = ({ socket, onFileSelect }) => {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPath, setCurrentPath] = useState('');
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
+  const [isCreating, setIsCreating] = useState<CreatingItem | null>(null);
+  const [newItemName, setNewItemName] = useState('');
+  const [fileTree, setFileTree] = useState<FileNode[]>([]);
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const fileExplorerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (socket) {
@@ -60,6 +84,86 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ socket, onFileSelect }) => 
       case 'css': return '🎨';
       case 'html': return '🌐';
       default: return '📄';
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, node: FileNode) => {
+    e.preventDefault();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      node
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  const createNewItem = (type: 'file' | 'directory', parent: string) => {
+    setIsCreating({ type, parent });
+    setNewItemName('');
+  };
+
+  const cancelCreate = () => {
+    setIsCreating(null);
+    setNewItemName('');
+  };
+
+  const confirmCreate = async () => {
+    if (!isCreating || !newItemName.trim()) return;
+
+    try {
+      const path = isCreating.parent ? `${isCreating.parent}/${newItemName}` : newItemName;
+
+      if (isCreating.type === 'file') {
+        await fetch(`http://localhost:3001/api/file`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path, content: '' })
+        });
+      } else {
+        await fetch(`http://localhost:3001/api/directory`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path })
+        });
+      }
+
+      loadFiles();
+      setIsCreating(null);
+      setNewItemName('');
+    } catch (error) {
+      console.error('Error creating item:', error);
+    }
+  };
+
+  const deleteItem = async (path: string) => {
+    if (!window.confirm(`Delete ${path}?`)) return;
+
+    try {
+      await fetch(`http://localhost:3001/api/file/${encodeURIComponent(path)}`, {
+        method: 'DELETE'
+      });
+      loadFiles();
+      closeContextMenu();
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+
+  const renameItem = async (oldPath: string, newName: string) => {
+    try {
+      const newPath = oldPath.replace(/[^/]+$/, newName);
+      await fetch(`http://localhost:3001/api/file/rename`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldPath, newPath })
+      });
+      loadFiles();
+      closeContextMenu();
+    } catch (error) {
+      console.error('Error renaming item:', error);
     }
   };
 
